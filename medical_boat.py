@@ -47,7 +47,7 @@ def dashoard():
         st.write("Explore the insights about medical insurance costs.")
     
 
-        tabs = st.tabs(["Stastical Overview", "Age Distribution","Gender Distribution","BMI Distribution","Smokers Distribution","Children Distribution","Regions Distribution"])
+        tabs = st.tabs(["Statistical Overview", "Age Distribution","Gender Distribution","BMI Distribution","Smokers Distribution","Children Distribution","Regions Distribution"])
 
         with tabs[0]:
             st.header("Insurance Data Statistical Overview")
