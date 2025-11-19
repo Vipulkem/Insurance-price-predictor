@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt 
 import seaborn as sns
 import pickle
-
+import plotly.express as px
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_squared_error, r2_score,accuracy_score
@@ -186,7 +186,7 @@ def dashoard():
         st.title("Exploratory Data Analysis (EDA)")
         st.write("Dive deeper into the insurance data and uncover hidden insights.")
 
-        tabs = st.sidebar.radio("Select Analysis:",["Bivariate Analysis","Correlation Heatmap"])
+        tabs = st.sidebar.radio("Select Analysis:",["Bivariate Analysis","Multivariate Analysis"])
 
         if tabs == "Bivariate Analysis":
 
@@ -194,10 +194,29 @@ def dashoard():
         
             with tabs[0]:
                 st.header("Age vs Gender of Insurance Holders")
+                fig = px.box(Insurance_Data, x="sex", y="age", points="all", color="sex",
+                            labels={"sex": "Gender", "age": "Age"},
+                            title="Age Distribution by Gender")
 
-                fig, ax = plt.subplots(figsize=(8, 6))
-                sns.countplot(x="sex", data=Insurance_Data, hue="smoker", ax=ax)
-                st.pyplot(fig)
+                st.plotly_chart(fig, use_container_width=True)
+
+                fig = px.violin(Insurance_Data, x="sex", y="age", box=True, points="all",
+                labels={"sex": "Gender", "age": "Age"},
+                title="Age Distribution by Gender")
+                st.plotly_chart(fig, use_container_width=True)
+
+
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")   
+                st.markdown('''
+                            - Age distributions for both genders are very similar.
+                            - Both groups have a comparable median age (around the 40s).
+                            - The spread of ages (interquartile range) is nearly identical for males and females.
+                            - Both groups show similar minimum and maximum ages, with no meaningful skew in either direction.
+                            - The scatter points confirm that age values are evenly spread within each gender, with no unusual clustering or gaps.
+
+                            ''')
+
 
             with tabs[1]:
 
@@ -217,6 +236,17 @@ def dashoard():
                 sns.scatterplot(x="age", y="charges", hue="smoker", data=Insurance_Data, ax=ax)
 
                 st.pyplot(fig)
+                
+                st.write("----------------------------------------------------------------------")
+                st.subheader("Insights:")
+                st.markdown('''
+                            - The scatter plot reveals a positive correlation between age and insurance charges, indicating that older individuals tend to incur higher costs.
+                            - Smokers consistently have higher charges compared to non-smokers across all age groups, highlighting the significant impact of smoking on insurance costs.
+                            - The trend lines for both smokers and non-smokers show an upward trajectory, but the slope for smokers is steeper, suggesting that the cost increase with age is more pronounced for smokers.
+                            - This analysis underscores the importance of age and smoking status as key factors influencing insurance charges.
+                            ''')
+
+
             with tabs[2]:
 
                 st.header("Smokers vs Gender")
@@ -239,7 +269,18 @@ def dashoard():
                 ax.set_ylabel("Count")
 
                 st.pyplot(fig)
-            
+
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")
+                st.markdown('''
+                            - Both males and females are predominantly non-smokers.
+
+                            - Males outnumber females among non-smokers.
+
+                            - Females show a higher number of smokers than males.
+
+                            - The smoker proportion is visibly higher among females than among males.
+                            ''')
             with tabs[3]:
 
                 st.header("BMI vs Charges Analysis")
@@ -251,6 +292,18 @@ def dashoard():
                 ax.set_ylabel("Charges")
 
                 st.pyplot(fig)
+
+
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")
+                st.markdown('''
+                            - Charges are substantially higher for smokers than for non-smokers at every BMI level.
+                            - Non-smokers show a wide spread of charges but remain mostly below roughly 15,000–20,000.
+                            - Smokers cluster at much higher charges, frequently exceeding 30,000 and reaching above 60,000.
+                            - Both groups show a positive relationship between BMI and charges, but the effect is much stronger for smokers.
+                            - At similar BMI values, smokers consistently incur significantly higher medical charges than non-smokers.
+                            ''')
+
 
 
                 # st.header("BMI vs Charges (Average Charges per BMI Category)")
@@ -299,6 +352,16 @@ def dashoard():
 
                 st.pyplot(fig)
 
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")    
+                st.markdown('''
+                            - Non-smokers form the majority in every region.
+                            - Smoker counts vary only slightly across regions, indicating no strong regional smoking pattern.
+                            - Region 1 shows the highest smoker count, while Region 0 and Region 2 show the lowest.
+                            - Overall, smoking prevalence is relatively consistent across all four regions.
+                            ''')
+
+
             with tabs[5]:
 
                 st.header("Smoker vs Charges Analysis")
@@ -311,30 +374,143 @@ def dashoard():
 
                 st.pyplot(fig)
 
-
-        elif tabs == "Correlation Heatmap":
-
-            st.header("Correlation Heatmap of Insurance Data")
-            plt.figure(figsize=(8,6))
-            correlation_matrix = Insurance_Data.corr()
-            sns.heatmap(correlation_matrix, annot=True, cmap='icefire', fmt=".2f")
-            plt.title('Correlation Heatmap')
-            plt.show()
-            st.pyplot(plt)
-
-            st.write("----------------------------------------------------------------------")
-
-            st.subheader("Insights:")
-            st.markdown('''
-                        - The heatmap reveals strong positive correlations between 'charges' and features like 'age', 'bmi', and 'smoker'.
-                        - This indicates that older individuals, those with higher BMI, and smokers tend to incur higher insurance costs.
-                        - Conversely, features like 'children' show weaker correlations with 'charges', suggesting a lesser impact on insurance costs.
-                        - Understanding these relationships can help in risk assessment and pricing strategies for insurance providers.
-    
-                                            ''')
+                
+                fig = px.violin(
+                    Insurance_Data,
+                    x="smoker",
+                    y="charges",
+                    box=True,
+                    points="all",
+                    color="smoker",
+                    labels={"smoker": "Smoker Status", "charges": "Charges"},
+                    title="Smoker vs Charges Distribution"
+                )
+                st.plotly_chart(fig, use_container_width=True)
 
 
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")   
+                st.markdown('''
+                            - Charges are highly skewed.
+                            - Smokers and non-smokers form two distinct groups.
+                            - A box/violin plot shows differences in median, variability, and outliers much more effectively than a bar chart or scatter plot.
+                            ''')
 
+        elif tabs == "Multivariate Analysis":
+            
+            tabs = st.tabs(["Correlation Heatmap","BMI vs Age vs Charges","Age vs Charges vs Smoker","3D Scatter Plot","Pair Plot (Scatter Matrix)"])
+            
+            with tabs[0]:
+                st.header("Correlation Heatmap of Insurance Data")
+                plt.figure(figsize=(8,6))
+                correlation_matrix = Insurance_Data.corr()
+                sns.heatmap(correlation_matrix, annot=True, cmap='icefire', fmt=".2f")
+                plt.title('Correlation Heatmap')
+                plt.show()
+                st.pyplot(plt)
+
+                st.write("----------------------------------------------------------------------")
+
+                st.subheader("Insights:")
+                st.markdown('''
+                            - The heatmap reveals strong positive correlations between 'charges' and features like 'age', 'bmi', and 'smoker'.
+                            - This indicates that older individuals, those with higher BMI, and smokers tend to incur higher insurance costs.
+                            - Conversely, features like 'children' show weaker correlations with 'charges', suggesting a lesser impact on insurance costs.
+                            - Understanding these relationships can help in risk assessment and pricing strategies for insurance providers.
+        
+                                                ''')
+            with tabs[1]:                
+                st.subheader("BMI vs Charges (Colored by Smoker, Sized by Age)")
+
+                fig = px.scatter(
+                    Insurance_Data,
+                    x="bmi",
+                    y="charges",
+                    color="smoker",
+                    size="age",
+                    hover_data=["age", "sex", "region"],
+                    labels={"bmi": "BMI", "charges": "Charges", "smoker": "Smoker"},
+                    title="BMI vs Charges Multivariate Analysis"
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")
+                st.markdown('''
+                            - The scatter plot reveals a positive correlation between BMI and insurance charges, indicating that individuals with higher BMI tend to incur higher costs.
+                            - Smokers consistently have higher charges compared to non-smokers across all BMI levels, highlighting the significant impact of smoking on insurance costs.
+                            - Age also plays a crucial role, as older individuals generally face higher charges, especially among smokers.
+                            - This multivariate analysis underscores the importance of BMI, smoking status, and age as key factors influencing insurance charges.
+                            ''')    
+            with tabs[2]:
+                st.subheader("Age vs Charges (Colored by Smoker)")
+
+                fig = px.scatter(
+                    Insurance_Data,
+                    x="age",
+                    y="charges",
+                    color="smoker",
+                    labels={"age": "Age", "charges": "Charges"},
+                    title="Age vs Charges Multivariate Analysis"
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")   
+                st.markdown('''
+                            - The scatter plot reveals a positive correlation between age and insurance charges, indicating that older individuals tend to incur higher costs.
+                            - Smokers consistently have higher charges compared to non-smokers across all age groups, highlighting the significant impact of smoking on insurance costs.
+                            - The trend lines for both smokers and non-smokers show an upward trajectory, but the slope for smokers is steeper, suggesting that the cost increase with age is more pronounced for smokers.
+                            - This multivariate analysis underscores the importance of age and smoking status as key factors influencing insurance charges.
+                            ''')
+
+            with tabs[3]:
+                st.subheader("3D Scatter Plot: Age, BMI, Charges")
+
+                fig = px.scatter_3d(
+                    Insurance_Data,
+                    x="age",
+                    y="bmi",
+                    z="charges",
+                    color="smoker",
+                    size="charges",
+                    labels={"age": "Age", "bmi": "BMI", "charges": "Charges"},
+                    title="3D Multivariate Analysis"
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("----------------------------------------------------------------------")  
+                st.subheader("Insights:")       
+                st.markdown('''
+                            - The 3D scatter plot reveals a complex relationship between age, BMI, and insurance charges.
+                            - Charges tend to increase with both age and BMI, indicating that older individuals with higher BMI incur greater insurance costs.
+                            - Smokers are distinctly clustered at higher charge levels, emphasizing the significant impact of smoking on insurance costs.
+                            - The size of the points, representing charges, further highlights that the highest costs are associated with older smokers who also have elevated BMI.
+                            - This multivariate analysis provides a comprehensive view of how these factors interplay to influence insurance charges.
+                            ''')
+
+            with tabs[4]:
+                st.subheader("Pair Plot (Scatter Matrix)")
+
+                fig = px.scatter_matrix(
+                    Insurance_Data,
+                    dimensions=["age", "bmi", "charges"],
+                    color="smoker",
+                    title="Scatter Matrix for Multivariate Relationships"
+                )
+
+                st.plotly_chart(fig, use_container_width=True)
+
+                st.write("----------------------------------------------------------------------")
+                st.subheader("Insights:")       
+                st.markdown('''
+                            - The scatter matrix reveals pairwise relationships among age, BMI, and insurance charges.
+                            - A positive correlation is evident between age and charges, as well as between BMI and charges, indicating that increases in either factor lead to higher insurance costs.
+                            - Smokers consistently exhibit higher charges across all pairwise comparisons, underscoring the significant impact of smoking on insurance costs.
+                            - The scatter plots also highlight the distribution and clustering of data points, providing insights into how these variables interact with each other.
+                            - This multivariate analysis offers a comprehensive understanding of the factors influencing insurance charges.
+                            ''')
 
     elif page == "Insurance Price":
         st.title("Insurance Price Predictor")
