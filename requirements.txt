@@ -48,6 +48,8 @@ parso==0.8.4
 pem==23.1.0
 pillow==11.0.0
 platformdirs==4.3.6
+plotly-base==6.5.0
+plotly==5.0.0
 plotly==6.5.0
 prompt_toolkit==3.0.50
 protobuf==6.33.0
